@@ -1,0 +1,151 @@
+package com.example.metabolicchart;
+
+
+import java.util.Scanner;
+
+
+public class MetabolicChart {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+
+        // Get user input
+        System.out.print("Enter your age: ");
+        int age = scanner.nextInt();
+
+
+        System.out.print("Enter your weight (in kilograms): ");
+        double weight = scanner.nextDouble();
+
+
+        System.out.print("Enter your height (in centimeters): ");
+        double height = scanner.nextDouble();
+
+
+        // Calculate basal metabolic rate (BMR) using Harris-Benedict equation
+        double bmr = calculateBMR(age, weight, height);
+
+
+        // Display nutritional information
+        System.out.println("Metabolic Chart");
+        System.out.println("BMR: " + bmr + " calories/day");
+        System.out.println("Nutritional Information:");
+        System.out.println("Carbohydrates: " + calculateCarbohydrates(bmr) + " grams/day");
+        System.out.println("Proteins: " + calculateProteins(bmr) + " grams/day");
+        System.out.println("Fats: " + calculateFats(bmr) + " grams/day");
+
+
+        // Get user's fitness goal
+        System.out.print("Enter your fitness goal (lose/gain/maintain): ");
+        String fitnessGoal = scanner.next();
+
+
+        // Display workout recommendation
+        System.out.println("Workout Recommendation:");
+        System.out.println(getWorkoutRecommendation(fitnessGoal));
+
+
+        scanner.close();
+    }
+
+
+    public static double calculateBMR(int age, double weight, double height) {
+        // Calculate BMR using Harris-Benedict equation
+        // For men: BMR = 88.362 + (13.397 x weight in kg) + (4.799 x height in cm) - (5.677 x age in years)
+        // For women: BMR = 447.593 + (9.247 x weight in kg) + (3.098 x height in cm) - (4.330 x age in years)
+        // Assuming user input is in centimeters and kilograms
+
+
+        // Constants for men and women
+        double bmrConstantMale = 88.362;
+        double bmrConstantFemale = 447.593;
+        double weightMultiplierMale = 13.397;
+        double weightMultiplierFemale = 9.247;
+        double heightMultiplierMale = 4.799;
+        double heightMultiplierFemale = 3.098;
+        double ageMultiplierMale = 5.677;
+        double ageMultiplierFemale = 4.330;
+
+
+        // Calculate BMR based on gender
+        if (age < 0 || weight <= 0 || height <= 0) {
+            throw new IllegalArgumentException("Invalid input values!");
+        } else {
+            if (age < 18) {
+                throw new IllegalArgumentException("Age should be 18 or above!");
+            } else {
+                if (weight > 0 && height > 0 && age > 0 && age <= 150) {
+                    double bmr;
+                    if (ageMultiplierMale != 0 && ageMultiplierFemale != 0) {
+                        bmr = (bmrConstantMale + (weightMultiplierMale * weight) + (heightMultiplierMale * height) - (ageMultiplierMale * age));
+                    } else {
+                        throw new IllegalArgumentException("Invalid input values!");
+                    }
+                    return bmr;
+                } else {
+                    throw new IllegalArgumentException("Invalid input values!");
+                }
+            }
+        }
+    }
+
+
+    public static double calculateCarbohydrates(double bmr) {
+        // Calculate carbohydrates needed based on BMR
+        // Assuming carbohydrates should be 45
+           double caloriesFromCarbs = bmr * 0.5; // Assuming 50% of total calories from carbs
+                double carbohydrates = caloriesFromCarbs / 4; // 1 gram of carbs = 4 calories
+
+
+                return carbohydrates;
+            }
+
+
+            public static double calculateProteins(double bmr) {
+                // Calculate proteins needed based on BMR
+                // Assuming proteins should be 10-35% of total calories
+
+
+                double caloriesFromProteins = bmr * 0.2; // Assuming 20% of total calories from proteins
+                double proteins = caloriesFromProteins / 4; // 1 gram of protein = 4 calories
+
+
+                return proteins;
+            }
+
+
+            public static double calculateFats(double bmr) {
+                // Calculate fats needed based on BMR
+                // Assuming fats should be 20-35% of total calories
+
+
+                double caloriesFromFats = bmr * 0.3; // Assuming 30% of total calories from fats
+                double fats = caloriesFromFats / 9; // 1 gram of fat = 9 calories
+
+
+                return fats;
+            }
+
+
+            public static String getWorkoutRecommendation(String fitnessGoal) {
+                // Provide workout recommendation based on fitness goal
+
+
+                String workoutRecommendation = "";
+                switch (fitnessGoal.toLowerCase()) {
+                    case "lose":
+                        workoutRecommendation = "For weight loss, focus on a combination of cardio exercises (such as running, cycling, or swimming) and strength training exercises (such as weightlifting or bodyweight exercises). Aim for at least 150 minutes of moderate-intensity cardio per week and 2-3 sessions of strength training.";
+                        break;
+                    case "gain":
+                        workoutRecommendation = "For weight gain, prioritize strength training exercises to build muscle mass. Focus on compound exercises like squats, deadlifts, bench presses, and shoulder presses. Aim for 3-4 strength training sessions per week and incorporate progressive overload to challenge your muscles.";
+                        break;
+                    case "maintain":
+                        workoutRecommendation = "To maintain your current fitness level, aim for a balanced workout routine that includes both cardio and strength training. Engage in moderate-intensity cardio exercises for at least 150 minutes per week and perform 2-3 strength training sessions targeting different muscle groups.";
+                        break;
+                    default:
+                        workoutRecommendation = "Invalid fitness goal entered. Please enter 'lose', 'gain', or 'maintain'.";
+                        break;
+                }
+                return workoutRecommendation;
+            }
+        }
