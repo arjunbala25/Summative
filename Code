@@ -1,0 +1,144 @@
+package com.example.metabolicchart;
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class MetabolicChartGUI extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Metabolic Chart");
+
+        // Create UI controls
+        Label ageLabel = new Label("Age:");
+        TextField ageTextField = new TextField();
+
+        Label weightLabel = new Label("Weight (in kilograms):");
+        TextField weightTextField = new TextField();
+
+        Label heightLabel = new Label("Height (in centimeters):");
+        TextField heightTextField = new TextField();
+
+        Button calculateButton = new Button("Calculate");
+        Label resultLabel = new Label();
+
+        // Add event handler to calculate button
+        calculateButton.setOnAction(event -> {
+            try {
+                int age = Integer.parseInt(ageTextField.getText());
+                double weight = Double.parseDouble(weightTextField.getText());
+                double height = Double.parseDouble(heightTextField.getText());
+
+                double bmr = calculateBMR(age, weight, height);
+                double carbohydrates = calculateCarbohydrates(bmr);
+                double proteins = calculateProteins(bmr);
+                double fats = calculateFats(bmr);
+
+                // Display results
+                resultLabel.setText("Metabolic Chart\n" +
+                        "BMR: " + bmr + " calories/day\n" +
+                        "Nutritional Information:\n" +
+                        "Carbohydrates: " + carbohydrates + " grams/day\n" +
+                        "Proteins: " + proteins + " grams/day\n" +
+                        "Fats: " + fats + " grams/day");
+            } catch (NumberFormatException e) {
+                resultLabel.setText("Invalid input values!");
+            } catch (IllegalArgumentException e) {
+                resultLabel.setText(e.getMessage());
+            }
+        });
+
+        // Create a grid pane and add UI controls
+        GridPane gridPane = new GridPane();
+        gridPane.setPadding(new Insets(10));
+        gridPane.setHgap(10);
+        gridPane.setVgap(5);
+        gridPane.addRow(0, ageLabel, ageTextField);
+        gridPane.addRow(1, weightLabel, weightTextField);
+        gridPane.addRow(2, heightLabel, heightTextField);
+        gridPane.add(calculateButton, 0, 3);
+        gridPane.add(resultLabel, 0, 4);
+
+        // Create a vertical box and add the grid pane
+        VBox vbox = new VBox(gridPane);
+        vbox.setPadding(new Insets(20));
+
+        // Set the scene
+        Scene scene = new Scene(vbox);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static double calculateBMR(int age, double weight, double height) {
+        // Calculate BMR using Harris-Benedict equation
+        // For men: BMR = 88.362 + (13.397 x weight in kg) + (4.799 x height in cm) - (5.677 x age in years)
+        // For women: BMR = 447.593 + (9.247 x weight in kg) + (3.098 x height in cm) - (4.330 x age in years)
+        // Assuming user input is in centimeters and kilograms
+
+        // Constants for men and women
+        double bmrConstantMale = 88.362;
+        double bmrConstantFemale = 447.593;
+        double weightMultiplierMale = 13.397;
+        double weightMultiplierFemale = 9.247;
+        double heightMultiplierMale = 4.799;
+        double heightMultiplierFemale = 3.098;
+        double ageMultiplierMale = 5.677;
+        double ageMultiplierFemale = 4.330;
+
+        // Calculate BMR based on gender
+        if (age < 0 || weight <= 0 || height <= 0) {
+            throw new IllegalArgumentException("Invalid input values!");
+        } else {
+            if (age < 18) {
+                throw new IllegalArgumentException("Age should be 18 or above!");
+            } else {
+                if (weight > 0 && height > 0 && age > 0 && age <= 150) {
+                    double bmr;
+                    if (ageMultiplierMale != 0 && ageMultiplierFemale != 0) {
+                        bmr = (bmrConstantMale + (weightMultiplierMale * weight) + (heightMultiplierMale * height) - (ageMultiplierMale * age));
+                    } else {
+                        throw new IllegalArgumentException("Invalid input values!");
+                    }
+                    return bmr;
+                } else {
+                    throw new IllegalArgumentException("Invalid input values!");
+                }
+            }
+        }
+    }
+
+    public static double calculateCarbohydrates(double bmr) {
+        // Calculate carbohydrates needed based on BMR
+        // Assuming carbohydrates should be 45
+        double caloriesFromCarbs = bmr * 0.5; // Assuming 50% of total calories from carbs
+        double carbohydrates = caloriesFromCarbs / 4; // 1 gram of carbs = 4 calories
+        return carbohydrates;
+    }
+
+    public static double calculateProteins(double bmr) {
+        // Calculate proteins needed based on BMR
+        // Assuming proteins should be 10-35% of total calories
+        double caloriesFromProteins = bmr * 0.2; // Assuming 20% of total calories from proteins
+        double proteins = caloriesFromProteins / 4; // 1 gram of protein = 4 calories
+        return proteins;
+    }
+
+    public static double calculateFats(double bmr) {
+        // Calculate fats needed based on BMR
+        // Assuming fats should be 20-35% of total calories
+        double caloriesFromFats = bmr * 0.3; // Assuming 30% of total calories from fats
+        double fats = caloriesFromFats / 9; // 1 gram of fat = 9 calories
+        return fats;
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
